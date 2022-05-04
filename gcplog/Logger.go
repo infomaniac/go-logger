@@ -55,6 +55,13 @@ func (l *Logger) SetLvl(lvl logger.Level) {
 	l.level = lvl
 }
 
+func (l *Logger) Payload(data any) {
+	e := logging.Entry{
+		Payload: data,
+	}
+	l.l.Log(e)
+}
+
 func (l *Logger) Debug(msg string) {
 	if !l.HasLvl(logger.DEBUG) {
 		return
