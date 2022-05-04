@@ -62,6 +62,7 @@ func (l *Logger) Debug(msg string) {
 
 	e := logging.Entry{
 		Severity: logging.Debug,
+		Payload:  msg,
 	}
 	l.l.Log(e)
 }
