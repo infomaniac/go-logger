@@ -1,7 +1,6 @@
 package clog
 
 import (
-	"errors"
 	"io"
 	"os"
 	"reflect"
@@ -56,105 +55,61 @@ func (l *Logger) SetLvl(lvl logger.Level) {
 	l.log = l.log.Level(zerolog.Level(lvl))
 }
 
-// Trace logs the message `msg` with the corresponding loglevel error.
-func (l *Logger) Trace(msg string) error {
-	l.log.Trace().Msg(msg)
-	return nil
-}
-
-// Debug logs the message `msg` with the corresponding loglevel error.
-func (l *Logger) Debug(msg string) error {
+func (l *Logger) Debug(msg string) {
 	l.log.Debug().Msg(msg)
-	return nil
 }
 
-// Info logs the message `msg` with the corresponding loglevel error.
-func (l *Logger) Info(msg string) error {
+func (l *Logger) Info(msg string) {
 	l.log.Info().Msg(msg)
-	return nil
 }
 
-// Warn logs the message `msg` with the corresponding loglevel error.
-func (l *Logger) Warn(msg string) error {
+func (l *Logger) Warn(msg string) {
 	l.log.Warn().Msg(msg)
-	return nil
 }
 
-// Error logs the message `msg` with the corresponding loglevel error.
-func (l *Logger) Error(msg string) error {
+func (l *Logger) Error(msg string) {
 	l.log.Error().Msg(msg)
-	return nil
 }
 
-// Fatal logs the message `msg` with the corresponding loglevel error.
 func (l *Logger) Fatal(msg string) {
 	l.log.Error().Msg(msg)
 	os.Exit(1)
 }
 
-// Tracef logs the message `msg` with the loglevel error.
-func (l *Logger) Tracef(format string, values ...interface{}) error {
-	l.log.Trace().Msgf(format, values...)
-	return nil
-}
-
-// Debugf logs the message `msg` with the loglevel error.
-func (l *Logger) Debugf(format string, values ...interface{}) error {
+func (l *Logger) Debugf(format string, values ...any) {
 	l.log.Debug().Msgf(format, values...)
-	return nil
 }
 
-// Infof logs the message `msg` with the loglevel error.
-func (l *Logger) Infof(format string, values ...interface{}) error {
+func (l *Logger) Infof(format string, values ...any) {
 	l.log.Info().Msgf(format, values...)
-	return nil
 }
 
-// Warnf logs the message `msg` with the loglevel error.
-func (l *Logger) Warnf(format string, values ...interface{}) error {
+func (l *Logger) Warnf(format string, values ...any) {
 	l.log.Warn().Msgf(format, values...)
-	return nil
 }
 
-// Errorf logs the message `msg` with the loglevel error.
-func (l *Logger) Errorf(format string, values ...interface{}) error {
+func (l *Logger) Errorf(format string, values ...any) {
 	l.log.Error().Msgf(format, values...)
-	return nil
 }
 
-// Fatalf logs the message `msg` with the loglevel error.
-func (l *Logger) Fatalf(format string, values ...interface{}) {
+func (l *Logger) Fatalf(format string, values ...any) {
 	l.log.Error().Msgf(format, values...)
 	os.Exit(1)
 }
 
-// Print logs the message `msg` with the DEBUG loglevel.
-func (l *Logger) Print(values ...interface{}) {
+func (l *Logger) Print(values ...any) {
 	l.log.Print(values...)
 }
 
-// Printf logs with the DEBUG loglevel.
-func (l *Logger) Printf(format string, values ...interface{}) {
+func (l *Logger) Printf(format string, values ...any) {
 	l.log.Printf(format, values...)
 }
 
-// Println logs with the DEBUG loglevel.
-func (l *Logger) Println(values ...interface{}) {
+func (l *Logger) Println(values ...any) {
 	l.log.Print(values...)
 }
 
 func (l *Logger) Write(data []byte) (int, error) {
-	switch l.level {
-	case logger.TRACE:
-		return len(data), l.Trace(string(data))
-	case logger.DEBUG:
-		return len(data), l.Debug(string(data))
-	case logger.INFO:
-		return len(data), l.Info(string(data))
-	case logger.WARN:
-		return len(data), l.Warn(string(data))
-	case logger.ERROR:
-		return len(data), l.Error(string(data))
-	}
-	return 0, errors.New("invalid log level")
+	l.Print(string(data))
+	return len(data), nil
 }

@@ -7,6 +7,4 @@ const (
 	INFO
 	WARN
 	ERROR
-	FATAL
-	TRACE Level = -1
 )

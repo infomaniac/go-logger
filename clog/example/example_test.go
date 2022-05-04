@@ -16,7 +16,6 @@ func TestDedicatedLogger(t *testing.T) {
 	ll := clog.New("MyModule", logger.DEBUG, true, out1, out2)
 	ll.Infof("This is a INFO logging statement %v", time.Now())
 
-	ll.Trace("This will be ignored, because of the loglevel")
 	ll.Warn("This is a warning")
 
 	ll.SetLvl(logger.INFO)
@@ -29,8 +28,6 @@ func TestDedicatedLogger(t *testing.T) {
 
 func TestGobalLogger(t *testing.T) {
 	clog.Infof("This is a INFO logging statement %v", time.Now())
-	clog.Trace("This will be ignored, because of the loglevel")
-	clog.SetLvl(logger.TRACE)
-	clog.Trace("Now, this  will be printed")
+	clog.SetLvl(logger.DEBUG)
 	clog.Warn("This is a warning")
 }

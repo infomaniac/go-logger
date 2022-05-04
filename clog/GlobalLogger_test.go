@@ -66,7 +66,6 @@ func TestLogLevelOutput(t *testing.T) {
 		lvl  logger.Level
 		name string
 	}{
-		{lvl: logger.TRACE, name: "TRACE"},
 		{lvl: logger.DEBUG, name: "DEBUG"},
 		{lvl: logger.INFO, name: "INFO"},
 		{lvl: logger.WARN, name: "WARN"},
@@ -76,14 +75,6 @@ func TestLogLevelOutput(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			buf := &bytes.Buffer{}
 			globallogger = New(tc.name, tc.lvl, false, buf)
-
-			Trace("tada")
-			switch HasLvl(logger.TRACE) {
-			case true:
-				assert.NotEmpty(t, buf, tc.name, tc.lvl)
-			case false:
-				assert.Empty(t, buf, tc.name, tc.lvl)
-			}
 
 			buf.Reset()
 			Debug("tada")
@@ -129,7 +120,6 @@ func TestLogLevelOutputf(t *testing.T) {
 		lvl  logger.Level
 		name string
 	}{
-		{lvl: logger.TRACE, name: "TRACE"},
 		{lvl: logger.DEBUG, name: "DEBUG"},
 		{lvl: logger.INFO, name: "INFO"},
 		{lvl: logger.WARN, name: "WARN"},
@@ -140,15 +130,6 @@ func TestLogLevelOutputf(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			buf := &bytes.Buffer{}
 			globallogger = New(tc.name, tc.lvl, false, buf)
-
-			buf.Reset()
-			Tracef("%s", "tada")
-			switch HasLvl(logger.TRACE) {
-			case true:
-				assert.NotEmpty(t, buf, tc.name, tc.lvl)
-			case false:
-				assert.Empty(t, buf, tc.name, tc.lvl)
-			}
 
 			buf.Reset()
 			Debugf("%s", "tada")
@@ -196,7 +177,6 @@ func TestLogLevelOutputDefault(t *testing.T) {
 		setLevel    logger.Level
 		expectEmpty bool
 	}{
-		{name: "TRACE", setLevel: logger.INFO, method: Trace, expectEmpty: true},
 		{name: "DEBUG", setLevel: logger.INFO, method: Debug, expectEmpty: true},
 		{name: "INFO ", setLevel: logger.INFO, method: Info, expectEmpty: false},
 		{name: "INFO ", setLevel: logger.WARN, method: Info, expectEmpty: true},
@@ -238,14 +218,12 @@ func TestPrint(t *testing.T) {
 func TestNoInit(t *testing.T) {
 	globallogger = New("global", logger.DEBUG, true)
 	msg := "tada"
-	Trace(msg)
 	Debug(msg)
 	Info(msg)
 	Warn(msg)
 	Error(msg)
 	Print(msg)
 
-	Tracef("%s", msg)
 	Debugf("%s", msg)
 	Infof("%s", msg)
 	Warnf("%s", msg)
@@ -264,54 +242,11 @@ func TestGlobalWrite(t *testing.T) {
 	e := &evt{}
 
 	buf.Reset()
-	SetLvl(logger.TRACE)
-	n, err := Write([]byte("HelloT"))
-	assert.Equal(t, n, 6)
-	assert.NoError(t, err)
-	json.Unmarshal(buf.Bytes(), e)
-	assert.Equal(t, "trace", e.Level)
-	assert.Equal(t, "HelloT", e.Message)
-
-	buf.Reset()
 	SetLvl(logger.DEBUG)
-	n, err = Write([]byte("HelloD"))
-	assert.Equal(t, n, 6)
+	n, err := Write([]byte("Hello"))
+	assert.Equal(t, n, 5)
 	assert.NoError(t, err)
 	json.Unmarshal(buf.Bytes(), e)
 	assert.Equal(t, "debug", e.Level)
-	assert.Equal(t, "HelloD", e.Message)
-
-	buf.Reset()
-	SetLvl(logger.INFO)
-	n, err = Write([]byte("HelloI"))
-	assert.Equal(t, n, 6)
-	assert.NoError(t, err)
-	json.Unmarshal(buf.Bytes(), e)
-	assert.Equal(t, "info", e.Level)
-	assert.Equal(t, "HelloI", e.Message)
-
-	buf.Reset()
-	SetLvl(logger.WARN)
-	n, err = Write([]byte("HelloW"))
-	assert.Equal(t, n, 6)
-	assert.NoError(t, err)
-	json.Unmarshal(buf.Bytes(), e)
-	assert.Equal(t, "warn", e.Level)
-	assert.Equal(t, "HelloW", e.Message)
-
-	buf.Reset()
-	SetLvl(logger.ERROR)
-	n, err = Write([]byte("HelloE"))
-	assert.Equal(t, n, 6)
-	assert.NoError(t, err)
-	json.Unmarshal(buf.Bytes(), e)
-	assert.Equal(t, "error", e.Level)
-	assert.Equal(t, "HelloE", e.Message)
-
-	buf.Reset()
-	SetLvl(12)
-	n, err = Write([]byte("HelloE"))
-	assert.Equal(t, n, 0)
-	assert.Error(t, err)
-	assert.Empty(t, buf.Bytes())
+	assert.Equal(t, "Hello", e.Message)
 }

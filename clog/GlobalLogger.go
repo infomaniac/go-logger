@@ -1,7 +1,6 @@
 package clog
 
 import (
-	"errors"
 	"os"
 
 	"github.com/infomaniac/go-logger"
@@ -30,22 +29,6 @@ func HasLvl(lvl logger.Level) bool {
 	return globallogger.HasLvl(lvl)
 }
 
-// Trace will send a log message with the corresponding loglevel
-func Trace(msg string) {
-	if !globallogger.HasLvl(logger.TRACE) {
-		return
-	}
-	globallogger.Trace(msg)
-}
-
-// Tracef will send a log message with the corresponding loglevel
-func Tracef(format string, values ...interface{}) {
-	if !globallogger.HasLvl(logger.TRACE) {
-		return
-	}
-	globallogger.Tracef(format, values...)
-}
-
 // Debug will send a log message with the corresponding loglevel
 func Debug(msg string) {
 	if !globallogger.HasLvl(logger.DEBUG) {
@@ -55,7 +38,7 @@ func Debug(msg string) {
 }
 
 // Debugf will send a log message with the corresponding loglevel
-func Debugf(format string, values ...interface{}) {
+func Debugf(format string, values ...any) {
 	if !globallogger.HasLvl(logger.DEBUG) {
 		return
 	}
@@ -71,7 +54,7 @@ func Info(msg string) {
 }
 
 // Infof will send a log message with the corresponding loglevel
-func Infof(format string, values ...interface{}) {
+func Infof(format string, values ...any) {
 	if !globallogger.HasLvl(logger.INFO) {
 		return
 	}
@@ -87,7 +70,7 @@ func Warn(msg string) {
 }
 
 // Warnf will send a log message with the corresponding loglevel
-func Warnf(format string, values ...interface{}) {
+func Warnf(format string, values ...any) {
 	if !globallogger.HasLvl(logger.WARN) {
 		return
 	}
@@ -100,7 +83,7 @@ func Error(msg string) {
 }
 
 // Errorf will send a log message with the corresponding loglevel
-func Errorf(format string, values ...interface{}) {
+func Errorf(format string, values ...any) {
 	globallogger.Errorf(format, values...)
 }
 
@@ -111,33 +94,23 @@ func Fatal(msg string) {
 }
 
 // Fatalf will send a log message with the corresponding loglevel
-func Fatalf(format string, values ...interface{}) {
+func Fatalf(format string, values ...any) {
 	globallogger.Errorf(format, values...)
 	os.Exit(1)
 }
 
 // Print will send a log message with the default loglevel
-func Print(msg ...interface{}) {
+func Print(msg ...any) {
 	globallogger.Print(msg...)
 }
 
 // Printf will send a log message with the default loglevel
-func Printf(format string, values ...interface{}) {
+func Printf(format string, values ...any) {
 	globallogger.Printf(format, values...)
 }
 
+// Printf will send a log message with the default loglevel
 func Write(data []byte) (int, error) {
-	switch globallogger.level {
-	case logger.TRACE:
-		return len(data), globallogger.Trace(string(data))
-	case logger.DEBUG:
-		return len(data), globallogger.Debug(string(data))
-	case logger.INFO:
-		return len(data), globallogger.Info(string(data))
-	case logger.WARN:
-		return len(data), globallogger.Warn(string(data))
-	case logger.ERROR:
-		return len(data), globallogger.Error(string(data))
-	}
-	return 0, errors.New("invalid log level")
+	globallogger.Print(string(data))
+	return len(data), nil
 }

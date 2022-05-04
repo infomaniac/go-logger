@@ -114,7 +114,6 @@ func TestGlobalLogLevelOutput(t *testing.T) {
 		lvl  logger.Level
 		name string
 	}{
-		{lvl: logger.TRACE, name: "TRACE"},
 		{lvl: logger.DEBUG, name: "DEBUG"},
 		{lvl: logger.INFO, name: "INFO"},
 		{lvl: logger.WARN, name: "WARN"},
@@ -124,14 +123,6 @@ func TestGlobalLogLevelOutput(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			buf := &bytes.Buffer{}
 			l := New(tc.name, tc.lvl, false, buf)
-
-			l.Trace("tada")
-			switch l.HasLvl(logger.TRACE) {
-			case true:
-				assert.NotEmpty(t, buf, tc.name, tc.lvl)
-			case false:
-				assert.Empty(t, buf, tc.name, tc.lvl)
-			}
 
 			buf.Reset()
 			l.Debug("tada")
@@ -177,7 +168,6 @@ func TestGlobalLogLevelOutputf(t *testing.T) {
 		lvl  logger.Level
 		name string
 	}{
-		{lvl: logger.TRACE, name: "TRACE"},
 		{lvl: logger.DEBUG, name: "DEBUG"},
 		{lvl: logger.INFO, name: "INFO"},
 		{lvl: logger.WARN, name: "WARN"},
@@ -188,15 +178,6 @@ func TestGlobalLogLevelOutputf(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			buf := &bytes.Buffer{}
 			l := New(tc.name, tc.lvl, false, buf)
-
-			buf.Reset()
-			l.Tracef("%s", "tada")
-			switch l.HasLvl(logger.TRACE) {
-			case true:
-				assert.NotEmpty(t, buf, tc.name, tc.lvl)
-			case false:
-				assert.Empty(t, buf, tc.name, tc.lvl)
-			}
 
 			buf.Reset()
 			l.Debugf("%s", "tada")
@@ -243,13 +224,10 @@ func TestLogLevelOutputDefault2(t *testing.T) {
 
 	testCases := []struct {
 		name        string
-		method      func(msg string) error
+		method      func(msg string)
 		setLevel    logger.Level
 		expectEmpty bool
 	}{
-		{name: "TRACE1", setLevel: logger.INFO, method: l.Trace, expectEmpty: true},
-		{name: "TRACE2", setLevel: logger.TRACE, method: l.Trace, expectEmpty: false},
-		{name: "DEBUG1", setLevel: logger.TRACE, method: l.Debug, expectEmpty: false},
 		{name: "DEBUG2", setLevel: logger.INFO, method: l.Debug, expectEmpty: true},
 		{name: "INFO1", setLevel: logger.INFO, method: l.Info, expectEmpty: false},
 		{name: "INFO2", setLevel: logger.WARN, method: l.Info, expectEmpty: true},
@@ -303,7 +281,7 @@ func TestNewWithNil(t *testing.T) {
 
 func TestWrite(t *testing.T) {
 	buf := &bytes.Buffer{}
-	l := New("TestWrite", logger.TRACE, false, buf)
+	l := New("TestWrite", logger.DEBUG, false, buf)
 
 	type evt struct {
 		Level   string
@@ -312,54 +290,10 @@ func TestWrite(t *testing.T) {
 	e := &evt{}
 
 	buf.Reset()
-	l.SetLvl(logger.TRACE)
-	n, err := l.Write([]byte("HelloT"))
-	assert.Equal(t, n, 6)
-	assert.NoError(t, err)
-	json.Unmarshal(buf.Bytes(), e)
-	assert.Equal(t, "trace", e.Level)
-	assert.Equal(t, "HelloT", e.Message)
-
-	buf.Reset()
 	l.SetLvl(logger.DEBUG)
-	n, err = l.Write([]byte("HelloD"))
-	assert.Equal(t, n, 6)
+	n, err := l.Write([]byte("Hello"))
+	assert.Equal(t, n, 5)
 	assert.NoError(t, err)
 	json.Unmarshal(buf.Bytes(), e)
 	assert.Equal(t, "debug", e.Level)
-	assert.Equal(t, "HelloD", e.Message)
-
-	buf.Reset()
-	l.SetLvl(logger.INFO)
-	n, err = l.Write([]byte("HelloI"))
-	assert.Equal(t, n, 6)
-	assert.NoError(t, err)
-	json.Unmarshal(buf.Bytes(), e)
-	assert.Equal(t, "info", e.Level)
-	assert.Equal(t, "HelloI", e.Message)
-
-	buf.Reset()
-	l.SetLvl(logger.WARN)
-	n, err = l.Write([]byte("HelloW"))
-	assert.Equal(t, n, 6)
-	assert.NoError(t, err)
-	json.Unmarshal(buf.Bytes(), e)
-	assert.Equal(t, "warn", e.Level)
-	assert.Equal(t, "HelloW", e.Message)
-
-	buf.Reset()
-	l.SetLvl(logger.ERROR)
-	n, err = l.Write([]byte("HelloE"))
-	assert.Equal(t, n, 6)
-	assert.NoError(t, err)
-	json.Unmarshal(buf.Bytes(), e)
-	assert.Equal(t, "error", e.Level)
-	assert.Equal(t, "HelloE", e.Message)
-
-	buf.Reset()
-	l.SetLvl(12)
-	n, err = l.Write([]byte("HelloE"))
-	assert.Equal(t, n, 0)
-	assert.Error(t, err)
-	assert.Empty(t, buf.Bytes())
 }
