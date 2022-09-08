@@ -297,3 +297,7 @@ func TestWrite(t *testing.T) {
 	json.Unmarshal(buf.Bytes(), e)
 	assert.Equal(t, "debug", e.Level)
 }
+
+func TestInterface(t *testing.T) {
+	assert.Implements(t, (*logger.ILogger)(nil), new(Logger))
+}

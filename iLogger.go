@@ -19,5 +19,5 @@ type ILogger interface {
 	// Compatiblity with io.Writer
 	Write(data []byte) (int, error)
 
-	SetLevel(Level)
+	SetLvl(Level)
 }
