@@ -16,8 +16,13 @@ type ILogger interface {
 	Fatal(msg string)
 	Fatalf(format string, values ...any)
 
+	// Compatibility with log.Logger
+	Print(msg ...any)
+	Printf(format string, values ...any)
+
 	// Compatiblity with io.Writer
 	Write(data []byte) (int, error)
 
 	SetLvl(Level)
+	Close() error
 }

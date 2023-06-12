@@ -3,7 +3,6 @@ package gcplog
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 
 	"cloud.google.com/go/logging"
@@ -44,9 +43,13 @@ func New(module string, lvl logger.Level) (*Logger, error) {
 	return l, nil
 }
 
-// HasLvl checks if a log statement will be printed when sent with a specific level.
+func (l *Logger) Close() error {
+	return l.client.Close()
+}
+
+// hasLvl checks if a log statement will be printed when sent with a specific level.
 // This can and should be used to see if a log statment should be prepared at all.
-func (l *Logger) HasLvl(lvl logger.Level) bool {
+func (l *Logger) hasLvl(lvl logger.Level) bool {
 	return l.level <= lvl
 }
 
@@ -55,115 +58,75 @@ func (l *Logger) SetLvl(lvl logger.Level) {
 	l.level = lvl
 }
 
-func (l *Logger) Payload(data any) {
-	e := logging.Entry{
-		Payload: data,
-	}
-	l.l.Log(e)
-}
-
 func (l *Logger) Debug(msg string) {
-	if !l.HasLvl(logger.DEBUG) {
+	if !l.hasLvl(logger.DEBUG) {
 		return
 	}
-
-	e := logging.Entry{
-		Severity: logging.Debug,
-		Payload:  msg,
-	}
-	l.l.Log(e)
+	l.l.StandardLogger(logging.Debug).Print(msg)
 }
 
 func (l *Logger) Info(msg string) {
-	if !l.HasLvl(logger.INFO) {
+	if !l.hasLvl(logger.INFO) {
 		return
 	}
-
-	l.l.Log(logging.Entry{
-		Severity: logging.Info,
-		Payload:  msg,
-	})
+	l.l.StandardLogger(logging.Info).Print(msg)
 }
 
 func (l *Logger) Warn(msg string) {
-	if !l.HasLvl(logger.WARN) {
+	if !l.hasLvl(logger.WARN) {
 		return
 	}
-
-	l.l.Log(logging.Entry{
-		Severity: logging.Warning,
-		Payload:  msg,
-	})
+	l.l.StandardLogger(logging.Warning).Print(msg)
 }
 
 func (l *Logger) Error(msg string) {
-	l.l.Log(logging.Entry{
-		Severity: logging.Error,
-		Payload:  msg,
-	})
+	l.l.StandardLogger(logging.Error).Print(msg)
 }
 
 func (l *Logger) Fatal(msg string) {
-	l.l.Log(logging.Entry{
-		Severity: logging.Emergency,
-		Payload:  msg,
-	})
+	l.l.StandardLogger(logging.Emergency).Print(msg)
 	os.Exit(1)
 }
 
-// Debugf logs the message `msg` with the loglevel error.
 func (l *Logger) Debugf(format string, values ...any) {
-	if !l.HasLvl(logger.DEBUG) {
+	if !l.hasLvl(logger.DEBUG) {
 		return
 	}
-
-	l.l.Log(logging.Entry{
-		Severity: logging.Debug,
-		Payload:  fmt.Sprintf(format, values...),
-	})
+	l.l.StandardLogger(logging.Debug).Printf(format, values...)
 }
 
 func (l *Logger) Infof(format string, values ...any) {
-	if !l.HasLvl(logger.INFO) {
+	if !l.hasLvl(logger.INFO) {
 		return
 	}
-
-	l.l.Log(logging.Entry{
-		Severity: logging.Info,
-		Payload:  fmt.Sprintf(format, values...),
-	})
+	l.l.StandardLogger(logging.Info).Printf(format, values...)
 }
 
 func (l *Logger) Warnf(format string, values ...any) {
-	if !l.HasLvl(logger.WARN) {
+	if !l.hasLvl(logger.WARN) {
 		return
 	}
-
-	l.l.Log(logging.Entry{
-		Severity: logging.Warning,
-		Payload:  fmt.Sprintf(format, values...),
-	})
+	l.l.StandardLogger(logging.Warning).Printf(format, values...)
 }
 
 func (l *Logger) Errorf(format string, values ...any) {
-	l.l.Log(logging.Entry{
-		Severity: logging.Error,
-		Payload:  fmt.Sprintf(format, values...),
-	})
+	l.l.StandardLogger(logging.Error).Printf(format, values...)
 }
 
 func (l *Logger) Fatalf(format string, values ...any) {
-	l.l.Log(logging.Entry{
-		Severity: logging.Emergency,
-		Payload:  fmt.Sprintf(format, values...),
-	})
+	l.l.StandardLogger(logging.Alert).Printf(format, values...)
 	os.Exit(1)
 }
 
+func (l *Logger) Print(msg ...any) {
+	l.l.StandardLogger(logging.Default).Print(msg...)
+}
+
+func (l *Logger) Printf(format string, values ...any) {
+	l.l.StandardLogger(logging.Default).Printf(format, values...)
+}
+
 func (l *Logger) Write(data []byte) (int, error) {
-	l.l.Log(logging.Entry{
-		Severity: logging.Default,
-		Payload:  string(data),
-	})
+	l.l.StandardLogger(logging.Default).Print(string(data))
 	return len(data), nil
 }

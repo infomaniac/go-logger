@@ -43,6 +43,10 @@ func New(module string, lvl logger.Level, stdoutConsole bool, uncheckedOut ...io
 	return l
 }
 
+func (l *Logger) Close() error {
+	return nil
+}
+
 // HasLvl checks if a log statement will be printed when sent with a specific level.
 // This can and should be used to see if a log statment should be prepared at all.
 func (l *Logger) HasLvl(lvl logger.Level) bool {

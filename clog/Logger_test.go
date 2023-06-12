@@ -15,6 +15,7 @@ func TestGlobalCreateLogger(t *testing.T) {
 	buf := &bytes.Buffer{}
 
 	l := New("TestCreateLogger", logger.DEBUG, false, buf)
+	defer l.Close()
 	e := &struct {
 		Module  string
 		Host    string

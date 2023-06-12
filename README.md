@@ -1,5 +1,14 @@
-# clog – coop logging for golang
-`clog` or "coop-log" is a convenience wrapper around `github.com/rs/zerolog` that makes it easy and intuitive to use.
+# Logging for Console and GCP
+
+## Common Interface `logger.ILogger`
+
+The `ILogger` interface is a common interface for all loggers in this package.
+It provides the ability, to use e.g. `clog` for unit test and `gcplog` for production.
+
+
+## clog
+
+`clog` or "console-log" is a convenience wrapper around `github.com/rs/zerolog` that makes it easy and intuitive to use.
 The default `stdout` logging produces nice and colourful log statements on linux consoles.
 The logger accepts multiple `io.Writer`s that will output log statements in JSON form.
 The fields are
@@ -18,22 +27,33 @@ The fields are
 	"message": "This is a INFO logging statement."
 }
 ```
-## Usage
+### Usage
 ### Dedicated logger
-The dedicated logger is the default way to use clog. A logger can be initialized with a "Module" parameter, that helps to separate different loggers from different modules.
+The dedicated logger is the default way to use clog. A logger can be initialized with a "Module" parameter, that helps to separate different loggers from different modules, meaning each module can use it's own logger and output will be prefixed accodingly.
+
+
 ```go
 out1 := &bytes.Buffer{} // or any other IO.writer
 out2 := &bytes.Buffer{} // or any other IO.writer
-import "gitlab.hs.coop.ch/middleware/golibs/clog"
 
-ll := clog.New("MyModule", clog.DEBUG, true, out1, out2)
+ll := clog.New("MyTestApplication", clog.DEBUG, true, out1, out2)
+defer ll.Close()
+
+ll.Info("This is an Info Statement")
 ```
 
-### Global Logger (stdout)
-The "global" logger can be used on a package level without special initialisation. The output is only on stdout and in plaintext, the log level can be set.
-```go
-import "gitlab.hs.coop.ch/middleware/golibs/clog"
 
-clog.Debugf("log this debug statement to stdout at %v", time.Now())
-clog.SetLvl(clog.INFO)
+## gcplog
+
+### Usage
+
+```go
+ll, err := gcplog.New("MyTestApplication", logger.DEBUG)
+if err != nil {
+	panic(err)
+}
+defer ll.Close()
+
+ll.Info("This is an Info Statement")
+
 ```
